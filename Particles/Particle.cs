@@ -4,9 +4,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using static Particles.MyMath;
 using static System.Math;
 
@@ -75,15 +73,17 @@ namespace Particles
         internal static void BeginDraw()
         {
             if (set._clearBuffer)
-            {
+            {//5984
                 //bg.Clear(set._backGroundColor);
+                
                 brsh.Color = set._backGroundColor;
                 Brush b = brsh;
                 if (bounds.Width != 0 && bounds.Height != 0)
                 {
-                    b = new LinearGradientBrush(bounds, set.bgColorFirst, set.bgColorSecond, set.bgStyle);
+                    //b = new LinearGradientBrush(bounds, set.bgColorFirst, set.bgColorSecond, set.bgStyle);
                     bg.FillRectangle(b, bounds);
                 }
+                
             }
             switch (set._colorMode)
             {

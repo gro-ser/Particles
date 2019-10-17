@@ -1,0 +1,11 @@
+C:\Users\groser\source\repos\Particles\Particles\bin\Release\Particles.exe.config
+C:\Users\groser\source\repos\Particles\Particles\bin\Release\Particles.exe
+C:\Users\groser\source\repos\Particles\Particles\bin\Release\Particles.pdb
+C:\Users\groser\source\repos\Particles\Particles\obj\Release\Particles.SettingsForm.resources
+C:\Users\groser\source\repos\Particles\Particles\obj\Release\Particles.Properties.Resources.resources
+C:\Users\groser\source\repos\Particles\Particles\obj\Release\Particles.csproj.GenerateResource.Cache
+C:\Users\groser\source\repos\Particles\Particles\obj\Release\Particles.csproj.CoreCompileInputs.cache
+C:\Users\groser\source\repos\Particles\Particles\obj\Release\Particles.exe
+C:\Users\groser\source\repos\Particles\Particles\obj\Release\Particles.pdb
+C:\Users\groser\source\repos\Particles\Particles\obj\Release\Particles.MainForm.resources
+C:\Users\groser\source\repos\Particles\Particles\obj\Release\Particles.csprojAssemblyReference.cache

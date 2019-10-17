@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<ParticleSettings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <bgStyle>Horizontal</bgStyle>
+  <bgColorFirst />
+  <bgColorSecond />
+  <ColorMode>Own</ColorMode>
+  <_OverallColor>-1</_OverallColor>
+  <_BackGroundColor>1056964608</_BackGroundColor>
+  <ColorFunction>FromImage</ColorFunction>
+  <ColorCreator xsi:type="FromImage" />
+  <Alpha>0.55</Alpha>
+  <ClearBuffer>true</ClearBuffer>
+  <CountOfParticles>200</CountOfParticles>
+  <NewLocationMode>Center</NewLocationMode>
+  <NewLocationPoint>
+    <X>0</X>
+    <Y>0</Y>
+  </NewLocationPoint>
+  <NewAngleRange>
+    <X>70</X>
+    <Y>110</Y>
+  </NewAngleRange>
+  <BounceMode>OppositeSide ResetTracing</BounceMode>
+  <ResetAngle>true</ResetAngle>
+  <Shape>Star</Shape>
+  <SpeedScale>3</SpeedScale>
+  <SizeScale>10</SizeScale>
+  <Tension>-0.5</Tension>
+  <Shapecreator>
+    <Factor>36</Factor>
+    <Scale>1</Scale>
+    <Scales>
+      <float>1</float>
+      <float>0.5</float>
+    </Scales>
+    <Factors />
+    <Count>10</Count>
+    <MoreScales>true</MoreScales>
+    <MoreFactors>false</MoreFactors>
+  </Shapecreator>
+  <MouseClickAction>RotateParticles</MouseClickAction>
+  <ShowTracingLine>false</ShowTracingLine>
+  <TracingLen>5</TracingLen>
+</ParticleSettings>

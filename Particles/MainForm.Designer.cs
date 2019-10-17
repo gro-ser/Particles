@@ -31,8 +31,8 @@
             this.components = new System.ComponentModel.Container();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.fpscounter = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
+            this.mode = new System.Windows.Forms.Label();
+            this.versionlabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // timer1
@@ -44,36 +44,42 @@
             // fpscounter
             // 
             this.fpscounter.AutoSize = true;
+            this.fpscounter.DataBindings.Add(new System.Windows.Forms.Binding("Visible", global::Particles.Properties.Settings.Default, "DebuggerLabels", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.fpscounter.ForeColor = System.Drawing.Color.Red;
             this.fpscounter.Location = new System.Drawing.Point(2, 2);
             this.fpscounter.Name = "fpscounter";
             this.fpscounter.Size = new System.Drawing.Size(35, 15);
             this.fpscounter.TabIndex = 0;
             this.fpscounter.Text = "fps:";
+            this.fpscounter.Visible = global::Particles.Properties.Settings.Default.DebuggerLabels;
             // 
-            // label1
+            // mode
             // 
-            this.label1.AutoSize = true;
-            this.label1.BackColor = System.Drawing.Color.Black;
-            this.label1.ForeColor = System.Drawing.Color.Yellow;
-            this.label1.Location = new System.Drawing.Point(2, 19);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(35, 15);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "None";
+            this.mode.AutoSize = true;
+            this.mode.BackColor = System.Drawing.Color.Black;
+            this.mode.DataBindings.Add(new System.Windows.Forms.Binding("Visible", global::Particles.Properties.Settings.Default, "DebuggerLabels", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.mode.ForeColor = System.Drawing.Color.Yellow;
+            this.mode.Location = new System.Drawing.Point(2, 19);
+            this.mode.Name = "mode";
+            this.mode.Size = new System.Drawing.Size(35, 15);
+            this.mode.TabIndex = 1;
+            this.mode.Text = "None";
+            this.mode.Visible = global::Particles.Properties.Settings.Default.DebuggerLabels;
             // 
-            // label2
+            // versionlabel
             // 
-            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.label2.AutoSize = true;
-            this.label2.ForeColor = System.Drawing.Color.Fuchsia;
-            this.label2.Location = new System.Drawing.Point(2, 456);
-            this.label2.Margin = new System.Windows.Forms.Padding(0);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(63, 15);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "version:";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.BottomRight;
+            this.versionlabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.versionlabel.AutoSize = true;
+            this.versionlabel.DataBindings.Add(new System.Windows.Forms.Binding("Visible", global::Particles.Properties.Settings.Default, "DebuggerLabels", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.versionlabel.ForeColor = System.Drawing.Color.Fuchsia;
+            this.versionlabel.Location = new System.Drawing.Point(2, 456);
+            this.versionlabel.Margin = new System.Windows.Forms.Padding(0);
+            this.versionlabel.Name = "versionlabel";
+            this.versionlabel.Size = new System.Drawing.Size(63, 15);
+            this.versionlabel.TabIndex = 2;
+            this.versionlabel.Text = "version:";
+            this.versionlabel.TextAlign = System.Drawing.ContentAlignment.BottomRight;
+            this.versionlabel.Visible = global::Particles.Properties.Settings.Default.DebuggerLabels;
             // 
             // MainForm
             // 
@@ -81,12 +87,13 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
             this.ClientSize = new System.Drawing.Size(496, 473);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.versionlabel);
+            this.Controls.Add(this.mode);
             this.Controls.Add(this.fpscounter);
             this.DoubleBuffered = true;
             this.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.Name = "MainForm";
+            this.ShowIcon = false;
             this.Text = "Particles";
             this.Load += new System.EventHandler(this.MainFormLoad);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
@@ -103,8 +110,8 @@
 
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Label fpscounter;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label mode;
+        private System.Windows.Forms.Label versionlabel;
     }
 }
 

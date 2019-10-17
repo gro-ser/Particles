@@ -1,14 +1,10 @@
-﻿using System;
+﻿using Particles.Properties;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Particles
@@ -24,14 +20,19 @@ namespace Particles
         Point MLoc;
         float scale;
         Stopwatch sw = new Stopwatch();
-        Object locker = new object();
 
-        public MainForm()
+        public MainForm(bool isSCR)
         {
             InitializeComponent();
-            //label2.Text = "ver:" + Application.ProductVersion;
             ShowVersionString();
-            sett.Show();
+            if (isSCR)
+            {
+                Settings.Default.DebuggerLabels = false;
+                FormBorderStyle = FormBorderStyle.None;
+                WindowState = FormWindowState.Maximized;
+            }
+            
+            else sett.Show();
             var sz = Screen.PrimaryScreen.Bounds.Size;
             var buf = new Bitmap(sz.Width, sz.Height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
             Particle.SetBuffer(buf);
@@ -42,16 +43,16 @@ namespace Particles
 
         private void ShowVersionString()
         {
-            label2.Text = AssemblyVersion(Assembly.GetCallingAssembly().GetName());
+            versionlabel.Text = AssemblyVersion(Assembly.GetCallingAssembly().GetName());
         }
 
         private string AssemblyVersion(AssemblyName name)
         {
             string ver; var g = CreateGraphics();
-            ver = string.Concat(name.Name, " Version:", name.Version);            
-            if (g.MeasureString(ver, Font).Width < Width-12) return ver;
+            ver = string.Concat(name.Name, " Version:", name.Version);
+            if (g.MeasureString(ver, Font).Width < Width - 12) return ver;
             ver = string.Concat(name.Name, ":", name.Version);
-            if (g.MeasureString(ver, Font).Width < Width-15) return ver;
+            if (g.MeasureString(ver, Font).Width < Width - 15) return ver;
             ver = string.Concat("ver:", name.Version);
             if (g.MeasureString(ver, Font).Width < Width - 15) return ver;
             ver = name.Version.ToString();
@@ -70,7 +71,7 @@ namespace Particles
                 if ((int)++tmp >= MAC) tmp = 0;
             }
             Particle.Settings.MouseClickAction = tmp;
-            label1.Text = tmp.ToString();
+            mode.Text = tmp.ToString();
         }
 
         private void MainFormLoad(object sender, EventArgs e)
@@ -103,7 +104,7 @@ namespace Particles
                 fps.Add((int)sw.ElapsedMilliseconds);
                 var avg = frames * 1000f / fps.Sum();
                 fpscounter.Text = $"FPS: {avg:000.000}";
-                fpscounter.Text = String.Format("FPS:{0,7:F3}", avg);
+                fpscounter.Text = String.Format("FPS:{0,7:F3}", avg)
                 //+$"\r\n{fps.Capacity}|{fps.Count}"
                 ;
             }
@@ -125,6 +126,12 @@ namespace Particles
                         list.Add(new Particle());
                     break;
                 case Keys.Z: Size = new Size(256, 256); break;
+                case Keys.Tab:
+                    Settings.Default.DebuggerLabels = !Settings.Default.DebuggerLabels;
+                    break;
+                case Keys.M:
+                    WindowState = (FormWindowState)(2 - (int)WindowState);
+                    break;
                 case var key when key >= Keys.NumPad5 && key <= Keys.NumPad9:
                     int pow = 1 << (key - Keys.NumPad0);
                     Size = new Size(pow, pow);
