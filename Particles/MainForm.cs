@@ -11,15 +11,15 @@ namespace Particles
 {
     public partial class MainForm : Form
     {
-        const bool ShowFPS = true;
-        const int frames = 30;
-        readonly static int MAC = Enum.GetNames(typeof(ParticleSettings.EMouseClickAction)).Length;
-        List<int> fps = new List<int>(frames);
-        SettingsForm sett = new SettingsForm();
-        List<Particle> list = new List<Particle>();
-        Point MLoc;
-        float scale;
-        Stopwatch sw = new Stopwatch();
+        private const bool ShowFPS = true;
+        private const int frames = 30;
+        private static readonly int MAC = Enum.GetNames(typeof(ParticleSettings.EMouseClickAction)).Length;
+        private readonly List<int> fps = new List<int>(frames);
+        private readonly SettingsForm sett = new SettingsForm();
+        private readonly List<Particle> list = new List<Particle>();
+        private Point MLoc;
+        private float scale;
+        private readonly Stopwatch sw = new Stopwatch();
 
         public MainForm(bool isSCR)
         {
@@ -31,13 +31,21 @@ namespace Particles
                 FormBorderStyle = FormBorderStyle.None;
                 WindowState = FormWindowState.Maximized;
             }
-            
-            else sett.Show();
-            var sz = Screen.PrimaryScreen.Bounds.Size;
-            var buf = new Bitmap(sz.Width, sz.Height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+
+            else
+            {
+                sett.Show();
+            }
+
+            Size sz = Screen.PrimaryScreen.Bounds.Size;
+            Bitmap buf = new Bitmap(sz.Width, sz.Height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
             Particle.SetBuffer(buf);
             BackgroundImage = buf;
-            for (int i = 0; i < frames; i++) fps.Add(0);
+            for (int i = 0; i < frames; i++)
+            {
+                fps.Add(0);
+            }
+
             MouseWheel += MainForm_MouseWheel;
         }
 
@@ -48,27 +56,45 @@ namespace Particles
 
         private string AssemblyVersion(AssemblyName name)
         {
-            string ver; var g = CreateGraphics();
+            string ver; Graphics g = CreateGraphics();
             ver = string.Concat(name.Name, " Version:", name.Version);
-            if (g.MeasureString(ver, Font).Width < Width - 12) return ver;
+            if (g.MeasureString(ver, Font).Width < Width - 12)
+            {
+                return ver;
+            }
+
             ver = string.Concat(name.Name, ":", name.Version);
-            if (g.MeasureString(ver, Font).Width < Width - 15) return ver;
+            if (g.MeasureString(ver, Font).Width < Width - 15)
+            {
+                return ver;
+            }
+
             ver = string.Concat("ver:", name.Version);
-            if (g.MeasureString(ver, Font).Width < Width - 15) return ver;
+            if (g.MeasureString(ver, Font).Width < Width - 15)
+            {
+                return ver;
+            }
+
             ver = name.Version.ToString();
             return ver;
         }
 
         private void MainForm_MouseWheel(object sender, MouseEventArgs e)
         {
-            var tmp = Particle.Settings.MouseClickAction;
+            ParticleSettings.EMouseClickAction tmp = Particle.Settings.MouseClickAction;
             if (e.Delta < 0)
             {
-                if (--tmp < 0) tmp = (ParticleSettings.EMouseClickAction)(MAC - 1);
+                if (--tmp < 0)
+                {
+                    tmp = (ParticleSettings.EMouseClickAction)(MAC - 1);
+                }
             }
             else
             {
-                if ((int)++tmp >= MAC) tmp = 0;
+                if ((int)++tmp >= MAC)
+                {
+                    tmp = 0;
+                }
             }
             Particle.Settings.MouseClickAction = tmp;
             mode.Text = tmp.ToString();
@@ -78,7 +104,9 @@ namespace Particles
         {
             Particle.Bounds = ClientRectangle;
             for (int i = Particle.Settings.CountOfParticles - 1; i >= 0; i--)
+            {
                 list.Add(new Particle());
+            }
         }
 
         private void MainFormResize(object sender, EventArgs e)
@@ -91,10 +119,13 @@ namespace Particles
         {
             sw.Restart();
             Particle.BeginDraw();
-            foreach (var p in list)
+            foreach (Particle p in list)
             {
                 if (!MLoc.IsEmpty)
+                {
                     p.InteractM(MLoc, scale);
+                }
+
                 p.StepDraw();
             }
             Refresh();
@@ -102,9 +133,9 @@ namespace Particles
             {
                 fps.RemoveAt(0);
                 fps.Add((int)sw.ElapsedMilliseconds);
-                var avg = frames * 1000f / fps.Sum();
+                float avg = frames * 1000f / fps.Sum();
                 fpscounter.Text = $"FPS: {avg:000.000}";
-                fpscounter.Text = String.Format("FPS:{0,7:F3}", avg)
+                fpscounter.Text = string.Format("FPS:{0,7:F3}", avg)
                 //+$"\r\n{fps.Capacity}|{fps.Count}"
                 ;
             }
@@ -123,7 +154,10 @@ namespace Particles
                 case Keys.Delete:
                     list.Clear();
                     for (int i = Particle.Settings.CountOfParticles - 1; i >= 0; i--)
+                    {
                         list.Add(new Particle());
+                    }
+
                     break;
                 case Keys.Z: Size = new Size(256, 256); break;
                 case Keys.Tab:
@@ -146,8 +180,14 @@ namespace Particles
             if (e.Button == MouseButtons.None)
             { MLoc = Point.Empty; return; }
             MLoc = e.Location;
-            if (e.Button == MouseButtons.Left) scale = 1;
-            else if (e.Button == MouseButtons.Right) scale = -1;
+            if (e.Button == MouseButtons.Left)
+            {
+                scale = 1;
+            }
+            else if (e.Button == MouseButtons.Right)
+            {
+                scale = -1;
+            }
             else
             {
                 scale = 0;

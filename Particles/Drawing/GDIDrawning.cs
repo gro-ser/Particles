@@ -1,31 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using static Particles.MyMath;
 
 namespace Particles.Drawing
 {
-    class GDIDrawning : IDrawing, IDisposable
+    internal class GDIDrawning : IDrawing, IDisposable
     {
-        readonly static FontFamily font = new FontFamily("Consolas");
-        ParticleSettings settings;
-        Graphics graphics, bg;
-        SolidBrush brsh = new SolidBrush(Color.White);
-        Bitmap buffer;
-        readonly Form form;
-        RectangleF bounds;
+        private static readonly FontFamily font = new FontFamily("Consolas");
+        private ParticleSettings settings;
+        private readonly Graphics graphics;
+        private Graphics bg;
+        private readonly SolidBrush brsh = new SolidBrush(Color.White);
+        private Bitmap buffer;
+        private readonly Form form;
+        private RectangleF bounds;
         public RectangleF Bounds
         {
             get => bounds;
-            set
-            {
-                bounds = value;
-            }
+            set => bounds = value;
         }
         public ParticleSettings Settings { get => settings; set => settings = value; }
 
@@ -39,7 +33,7 @@ namespace Particles.Drawing
 
         public void Init()
         {
-            var sz = Screen.PrimaryScreen.Bounds.Size;
+            Size sz = Screen.PrimaryScreen.Bounds.Size;
             buffer = new Bitmap(sz.Width, sz.Height);
             bg = Graphics.FromImage(buffer);
             form.BackgroundImage = buffer;
@@ -76,9 +70,9 @@ namespace Particles.Drawing
 
         public void Draw(Particle p)
         {
-            var sz = new SizeF(p.f_size, p.f_size);
-            var hs = new SizeF(sz.Width / 2, sz.Height / 2);
-            var rec = new RectangleF(PointF.Subtract(p.loc, hs), sz);
+            SizeF sz = new SizeF(p.f_size, p.f_size);
+            SizeF hs = new SizeF(sz.Width / 2, sz.Height / 2);
+            RectangleF rec = new RectangleF(PointF.Subtract(p.loc, hs), sz);
             switch (settings._colorMode)
             {
                 case ParticleSettings.EColorMode.Own:
@@ -94,7 +88,11 @@ namespace Particles.Drawing
                     break;
             }
             brsh.Color = Color.FromArgb((byte)(255 * settings._alpha), brsh.Color);
-            if (settings._showTracingLine && p.tracing.Count > 1) bg.DrawCurve(new Pen(brsh.Color), p.tracing.ToArray());
+            if (settings._showTracingLine && p.tracing.Count > 1)
+            {
+                bg.DrawCurve(new Pen(brsh.Color), p.tracing.ToArray());
+            }
+
             switch (settings._shape)
             {
                 case ParticleSettings.EShape.Sphere:
@@ -104,7 +102,7 @@ namespace Particles.Drawing
                     bg.FillRectangle(brsh, rec);
                     break;
                 case ParticleSettings.EShape.Custom:
-                    bg.DrawString(this.GetHashCode().ToString(), new Font(font, abs(p.f_size)), brsh, p.loc);
+                    bg.DrawString(GetHashCode().ToString(), new Font(font, abs(p.f_size)), brsh, p.loc);
                     break;
                 default:
                     bg.FillClosedCurve(brsh, settings._shapecreator.GetPoints(p.loc, hs, p.angle), FillMode.Alternate, settings._tension);

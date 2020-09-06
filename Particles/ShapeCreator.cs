@@ -18,14 +18,22 @@ namespace Particles
         public bool MoreFactors { get; set; }
         public PointF[] GetPoints(PointF loc, SizeF hs, float angle)
         {
-            var arr = new PointF[Count];
+            PointF[] arr = new PointF[Count];
             float scale = Scale, factor = Factor;
             bool ms = MoreScales, mf = MoreFactors;
             int fl = Factors.Length, sl = Scales.Length;
             for (int i = 0; i < Count; i++)
             {
-                if (mf && fl != 0) factor = Factors[i % fl];
-                if (ms && sl != 0) scale = Scales[i % sl];
+                if (mf && fl != 0)
+                {
+                    factor = Factors[i % fl];
+                }
+
+                if (ms && sl != 0)
+                {
+                    scale = Scales[i % sl];
+                }
+
                 angle += factor;
                 arr[i] = new PointF(loc.X + scale * hs.Width * cos(angle), loc.Y + scale * hs.Height * sin(angle));
             }
@@ -56,7 +64,7 @@ namespace Particles
         };
         public static ShapeCreator Custom { get; set; } = new ShapeCreator()
         {
-            Count=6, 
+            Count = 6,
             MoreScales = true,
             MoreFactors = true,
             Factors = new float[]

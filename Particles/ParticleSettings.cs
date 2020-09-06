@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Drawing.Drawing2D;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
+using System.Xml.Serialization;
 
 namespace Particles
 {
@@ -31,7 +27,7 @@ namespace Particles
         internal ShapeCreator _shapecreator;
         internal ENewLocationMode _newLocationMode;
         internal PointF _newLocationPoint;
-        internal PointF _newAngleRange = new PointF(0,360);
+        internal PointF _newAngleRange = new PointF(0, 360);
         internal EBounceMode _bounceMode;
         internal EMouseClickAction _mouseClickAction;
         internal bool _showTracingLine;
@@ -41,7 +37,7 @@ namespace Particles
         #endregion
 
         #region Coloring
-        const string r_coloring = "Coloring";
+        private const string r_coloring = "Coloring";
         [Category(r_coloring)]
         public LinearGradientMode bgStyle { get; set; }
         [Category(r_coloring)]
@@ -111,7 +107,7 @@ namespace Particles
         #endregion
 
         #region Drawning
-        const string r_drawning = "Drawning";
+        private const string r_drawning = "Drawning";
         [Category(r_drawning)]
         public bool ClearBuffer
         { get => _clearBuffer; set => _clearBuffer = value; }
@@ -120,7 +116,7 @@ namespace Particles
         #endregion
 
         #region Locating
-        const string r_locating = "Locating";
+        private const string r_locating = "Locating";
         public enum ENewLocationMode { Center, Random, Zeroes, Point }
         [Category(r_locating)]
         public ENewLocationMode NewLocationMode
@@ -143,7 +139,7 @@ namespace Particles
         #endregion
 
         #region Shaping
-        const string r_shaping = "Shaping";
+        private const string r_shaping = "Shaping";
         public enum EShape
         { Sphere, Rectangle, Hexagon, Star, Triangle, Custom }
         [Category(r_shaping)]
@@ -187,7 +183,7 @@ namespace Particles
         #endregion
 
         #region Interacting
-        const string r_interacting = "Interacting";
+        private const string r_interacting = "Interacting";
         public enum EMouseClickAction
         {
             None,
@@ -202,7 +198,7 @@ namespace Particles
         #endregion
 
         #region Tracing
-        const string r_tracing = "Tracing";
+        private const string r_tracing = "Tracing";
         [Category(r_tracing)]
         public bool ShowTracingLine
         { get => _showTracingLine; set => _showTracingLine = value; }
@@ -214,7 +210,7 @@ namespace Particles
         #region Debugging
 
         #endregion
-        
+
         internal static ParticleSettings Default()
         {
             return new ParticleSettings()
@@ -249,10 +245,10 @@ namespace Particles
 
         public static string Info(object obj, string delimeter = "\r\n")
         {
-            var type = obj.GetType();
-            var props = type.GetProperties();
-            var sb = new StringBuilder(type.Name).Append(" {").Append(delimeter);
-            foreach (var prop in props)
+            Type type = obj.GetType();
+            System.Reflection.PropertyInfo[] props = type.GetProperties();
+            StringBuilder sb = new StringBuilder(type.Name).Append(" {").Append(delimeter);
+            foreach (System.Reflection.PropertyInfo prop in props)
             {
                 sb
                     .Append('\t')
@@ -264,34 +260,38 @@ namespace Particles
             }
             return sb.Append('}').ToString();
         }
-        public override string ToString() => Info(this);
+        public override string ToString()
+        {
+            return Info(this);
+        }
+
         public void SaveXml()
         {
             XmlSerializer xml = new XmlSerializer(typeof(ParticleSettings));
-            var file = File.Open("settings.xml", FileMode.Create);
+            FileStream file = File.Open("settings.xml", FileMode.Create);
             xml.Serialize(file, this);
             file.Close();
         }
-        static public ParticleSettings LoadXml()
+        public static ParticleSettings LoadXml()
         {
             XmlSerializer xml = new XmlSerializer(typeof(ParticleSettings));
-            var file = File.OpenRead("settings.xml");
-            var res = (ParticleSettings)xml.Deserialize(file);
+            FileStream file = File.OpenRead("settings.xml");
+            ParticleSettings res = (ParticleSettings)xml.Deserialize(file);
             file.Close();
             return res;
         }
         public void SaveBin()
         {
-            var bin = new BinaryFormatter();
-            var file = File.Open("settings.bin", FileMode.Create);
+            BinaryFormatter bin = new BinaryFormatter();
+            FileStream file = File.Open("settings.bin", FileMode.Create);
             bin.Serialize(file, this);
             file.Close();
         }
         public static ParticleSettings LoadBin()
         {
             BinaryFormatter bin = new BinaryFormatter();
-            var file = File.OpenRead("settings.bin");
-            var res = (ParticleSettings)bin.Deserialize(file);
+            FileStream file = File.OpenRead("settings.bin");
+            ParticleSettings res = (ParticleSettings)bin.Deserialize(file);
             res.ColorFunction = res._colorFunction;
             file.Close();
             return res;

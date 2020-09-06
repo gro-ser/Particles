@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Particles
@@ -51,12 +45,12 @@ namespace Particles
 
         private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
-            label1.Text = ParticleSettings.Info(e, delimeter:" ");
+            label1.Text = ParticleSettings.Info(e, delimeter: " ");
         }
 
         private void propertyGrid1_SelectedGridItemChanged(object sender, SelectedGridItemChangedEventArgs e)
         {
-            label1.Text = ParticleSettings.Info(e, delimeter:" ");
+            label1.Text = ParticleSettings.Info(e, delimeter: " ");
         }
 
         private void button5_Click(object sender, EventArgs e)
@@ -74,11 +68,12 @@ namespace Particles
             grid.SelectedObject = SubSettings.Sub;
         }
     }
-    class SubSettings
+
+    internal class SubSettings
     {
         [TypeConverter(typeof(ColorCreatorConverter))]
         [Description("some settings")]
         public ParticleSettings Settings { get; set; } = Particle.Settings;
-        static public SubSettings Sub { get; } = new SubSettings();
+        public static SubSettings Sub { get; } = new SubSettings();
     }
 }

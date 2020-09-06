@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Windows.Forms;
-using System.Drawing;
-using System.ComponentModel;
 using System.Collections;
+using System.ComponentModel;
 using System.ComponentModel.Design.Serialization;
-using System.Reflection;
+using System.Drawing;
 using System.Globalization;
+using System.Reflection;
 
 namespace Particles
 {
-    internal class PointFConverter:TypeConverter
+    internal class PointFConverter : TypeConverter
     {
         /// <summary>
 		///         Определяет, если этот преобразователь выполнить преобразование объекта заданного исходного типа в собственный тип преобразователя.

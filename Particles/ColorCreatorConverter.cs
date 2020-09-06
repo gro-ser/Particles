@@ -1,15 +1,9 @@
 ﻿using System;
-using System.Windows.Forms;
-using System.Drawing;
 using System.ComponentModel;
-using System.Collections;
-using System.ComponentModel.Design.Serialization;
-using System.Reflection;
-using System.Globalization;
 
 namespace Particles
 {
-    internal class ColorCreatorConverter:TypeConverter
+    internal class ColorCreatorConverter : TypeConverter
     {
         public override bool GetPropertiesSupported(ITypeDescriptorContext context)
         {

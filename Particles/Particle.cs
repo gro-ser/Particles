@@ -12,18 +12,18 @@ namespace Particles
 {
     public class Particle
     {
-        readonly static FontFamily font = new FontFamily("Consolas");
+        private static readonly FontFamily font = new FontFamily("Consolas");
 
         #region Constants
-        const float minScale = 1f, maxScale = 5;
+        private const float minScale = 1f, maxScale = 5;
         #endregion
 
         #region StaticField
-        static bool mybuf = true;
-        static Bitmap buff;
+        private static bool mybuf = true;
+        private static Bitmap buff;
         private static Graphics bg;
         internal static SolidBrush brsh = new SolidBrush(Color.White);
-        static readonly Random r = new Random();
+        private static readonly Random r = new Random();
         private static RectangleF bounds;
         private static ParticleSettings set = ParticleSettings.Default();
         #endregion
@@ -74,8 +74,8 @@ namespace Particles
         {
             if (set._clearBuffer)
             {//5984
-                //bg.Clear(set._backGroundColor);
-                
+             //bg.Clear(set._backGroundColor);
+
                 brsh.Color = set._backGroundColor;
                 Brush b = brsh;
                 if (bounds.Width != 0 && bounds.Height != 0)
@@ -83,7 +83,7 @@ namespace Particles
                     //b = new LinearGradientBrush(bounds, set.bgColorFirst, set.bgColorSecond, set.bgStyle);
                     bg.FillRectangle(b, bounds);
                 }
-                
+
             }
             switch (set._colorMode)
             {
@@ -100,8 +100,8 @@ namespace Particles
         public static void Save(string name)
         {
             //buff.Save(Environment.CurrentDirectory + "\\" + name);
-            var sw = new FileStream(name, FileMode.Create);
-            var bmp = new Bitmap(buff, (int)bounds.Width, (int)bounds.Height);
+            FileStream sw = new FileStream(name, FileMode.Create);
+            Bitmap bmp = new Bitmap(buff, (int)bounds.Width, (int)bounds.Height);
             bmp.Save(sw, ImageFormat.Png);
             sw.Close();
         }//TODO!
@@ -113,8 +113,14 @@ namespace Particles
             scale = Scale;
             angle = Angle;
             if (Location != PointF.Empty)
+            {
                 loc = Location;
-            else ResetLocation();
+            }
+            else
+            {
+                ResetLocation();
+            }
+
             color = Color;
         }
         public Particle() : this(rnd_f(set._newAngleRange.X, set._newAngleRange.Y), rnd_f(minScale, maxScale, 10000), rnd_cl()) { }
@@ -141,16 +147,22 @@ namespace Particles
                     break;
             }
             if ((set._bounceMode & ParticleSettings.EBounceMode.ResetTracing) == ParticleSettings.EBounceMode.ResetTracing)
+            {
                 tracing.Clear();
+            }
+
             if (set._resetAngle)
+            {
                 angle = rnd_f(set._newAngleRange.X, set._newAngleRange.Y);
+            }
+
             scale = rnd_f(minScale, maxScale);
         }
         public void Draw()
         {
-            var sz = new SizeF(f_size, f_size);
-            var hs = new SizeF(sz.Width / 2, sz.Height / 2);
-            var rec = new RectangleF(PointF.Subtract(loc, hs), sz);
+            SizeF sz = new SizeF(f_size, f_size);
+            SizeF hs = new SizeF(sz.Width / 2, sz.Height / 2);
+            RectangleF rec = new RectangleF(PointF.Subtract(loc, hs), sz);
             switch (set._colorMode)
             {
                 case ParticleSettings.EColorMode.Own:
@@ -166,7 +178,11 @@ namespace Particles
                     break;
             }
             brsh.Color = Color.FromArgb((byte)(255 * set._alpha), brsh.Color);
-            if (set._showTracingLine && tracing.Count > 1) bg.DrawCurve(new Pen(brsh.Color), tracing.ToArray());
+            if (set._showTracingLine && tracing.Count > 1)
+            {
+                bg.DrawCurve(new Pen(brsh.Color), tracing.ToArray());
+            }
+
             switch (set._shape)
             {
                 case ParticleSettings.EShape.Sphere:
@@ -177,8 +193,8 @@ namespace Particles
                     break;
                 case ParticleSettings.EShape.Custom:
                     goto default;
-                    var str = keywords[GetHashCode() % keycount];
-                    var fon = new Font(str, abs(f_size));
+                    string str = keywords[GetHashCode() % keycount];
+                    Font fon = new Font(str, abs(f_size));
                     sz = bg.MeasureString(str, fon);
                     hs = new SizeF(sz.Width / 2, sz.Height / 2);
                     bg.DrawString(str, fon, brsh, PointF.Subtract(loc, hs));
@@ -189,19 +205,32 @@ namespace Particles
                     break;
             }
         }
-        static PointF[] Polygon(PointF loc, SizeF hs, float angle) => set._shapecreator.GetPoints(loc, hs, angle);
+
+        private static PointF[] Polygon(PointF loc, SizeF hs, float angle)
+        {
+            return set._shapecreator.GetPoints(loc, hs, angle);
+        }
+
         public void Step()
         {
-            var v = PointF.Add(loc, a_vec);
+            PointF v = PointF.Add(loc, a_vec);
             if (bounds.Contains(v)) { loc = v; coob = 0; }
             else
             {
                 if (++coob == 5) { ResetLocation(); coob = 0; return; }
-                var bnc = set._bounceMode;
+                ParticleSettings.EBounceMode bnc = set._bounceMode;
                 if ((bnc & ParticleSettings.EBounceMode.ReflectAngle) == ParticleSettings.EBounceMode.ReflectAngle)
                 {
-                    if (v.X < bounds.Left || bounds.Right < v.X) angle = 180 - angle;
-                    if (v.Y < bounds.Top || bounds.Bottom < v.Y) angle = -angle;
+                    if (v.X < bounds.Left || bounds.Right < v.X)
+                    {
+                        angle = 180 - angle;
+                    }
+
+                    if (v.Y < bounds.Top || bounds.Bottom < v.Y)
+                    {
+                        angle = -angle;
+                    }
+
                     loc = PointF.Add(loc, a_vec);
                 }
                 if ((bnc & ParticleSettings.EBounceMode.OppositeSide) == ParticleSettings.EBounceMode.OppositeSide)
@@ -215,7 +244,11 @@ namespace Particles
                     tracing.Clear(); return;
                 }
             }
-            if (tracing.Count >= set._tracingLen) tracing.RemoveRange(0, tracing.Count - set._tracingLen);
+            if (tracing.Count >= set._tracingLen)
+            {
+                tracing.RemoveRange(0, tracing.Count - set._tracingLen);
+            }
+
             tracing.Add(loc);
         }
         public void InteractM(Point mloc, float scale = 1)
@@ -247,7 +280,11 @@ namespace Particles
                     tmp = (float)(Atan2(scale * (mloc.Y - loc.Y), scale * (mloc.X - loc.X)) * 180 / PI);
                     sz = new SizeF(f_speed * cos(tmp), f_speed * sin(tmp));
                     tmp = 10f * f_size * (sqrt(sqr(loc.X - mloc.X) + sqr(loc.Y - mloc.Y)) / sqrt(sqr(bounds.Width) + sqr(bounds.Height)));
-                    if (float.IsInfinity(tmp)) tmp = 0;
+                    if (float.IsInfinity(tmp))
+                    {
+                        tmp = 0;
+                    }
+
                     sz = new SizeF(sz.Width * tmp, sz.Height * tmp);
                     loc = PointF.Add(loc, sz);
                     //angle += Abs(tmp - angle) / 30;
@@ -260,13 +297,13 @@ namespace Particles
 
         public override string ToString()
         {
-            var delimeter = "\r\n";
-            var type = typeof(Particle);
-            var props = type.GetFields(
+            string delimeter = "\r\n";
+            Type type = typeof(Particle);
+            System.Reflection.FieldInfo[] props = type.GetFields(
                 System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance
                 );
-            var sb = new StringBuilder(type.Name).Append(" {").Append(delimeter);
-            foreach (var prop in props)
+            StringBuilder sb = new StringBuilder(type.Name).Append(" {").Append(delimeter);
+            foreach (System.Reflection.FieldInfo prop in props)
             {
                 sb
                     .Append('\t')
@@ -279,11 +316,12 @@ namespace Particles
             return sb.Append('}').ToString();
         }
 
-        static string[] keywords =
+        private static readonly string[] keywords =
             {"ХУЙ","ПИЗДА","Джигурда" };
-            //{ "Consolas", "Courier New", "Fira Code", "Lucida Console", "Unispace"};
-            //{ "VisualBasic", "CSharp", "Pascal", "JavaScript", "HTML","Assembler"};
-            //{ "abstract", "as", "base", "bool", "break", "byte", "case", "catch", "char", "checked", "class", "const", "continue", "decimal", "default", "delegate", "do", "double", "else", "enum", "event", "explicit", "extern", "false", "finally", "fixed", "float", "for", "foreach", "goto", "if", "implicit", "in", "int", "interface", "internal", "is", "lock", "long", "namespace", "new", "null", "object", "operator", "out", "override", "params", "private", "protected", "public", "readonly", "ref", "return", "sbyte", "sealed", "short", "sizeof", "stackalloc", "static", "string", "struct", "switch", "this", "throw", "true", "try", "typeof", "uint", "ulong", "unchecked", "unsafe", "ushort", "using", "using", "static", "virtual", "void", "volatile", "while" };
-        static int keycount = keywords.Length;
+
+        //{ "Consolas", "Courier New", "Fira Code", "Lucida Console", "Unispace"};
+        //{ "VisualBasic", "CSharp", "Pascal", "JavaScript", "HTML","Assembler"};
+        //{ "abstract", "as", "base", "bool", "break", "byte", "case", "catch", "char", "checked", "class", "const", "continue", "decimal", "default", "delegate", "do", "double", "else", "enum", "event", "explicit", "extern", "false", "finally", "fixed", "float", "for", "foreach", "goto", "if", "implicit", "in", "int", "interface", "internal", "is", "lock", "long", "namespace", "new", "null", "object", "operator", "out", "override", "params", "private", "protected", "public", "readonly", "ref", "return", "sbyte", "sealed", "short", "sizeof", "stackalloc", "static", "string", "struct", "switch", "this", "throw", "true", "try", "typeof", "uint", "ulong", "unchecked", "unsafe", "ushort", "using", "using", "static", "virtual", "void", "volatile", "while" };
+        private static readonly int keycount = keywords.Length;
     }
 }
