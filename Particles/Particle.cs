@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -12,20 +12,17 @@ namespace Particles
 {
     public class Particle
     {
-        private static readonly FontFamily font = new FontFamily("Consolas");
-
         #region Constants
-        private const float minScale = 1f, maxScale = 5;
+        private const float minScale = 1, maxScale = 5;
         #endregion
 
         #region StaticField
-        private static bool mybuf = true;
-        private static Bitmap buff;
-        private static Graphics bg;
-        internal static SolidBrush brsh = new SolidBrush(Color.White);
-        private static readonly Random r = new Random();
+        private static bool useBuffer = true;
+        private static Bitmap buffer;
+        private static Graphics bufferedGraphics;
+        private static SolidBrush brush = new SolidBrush(Color.White);
         private static RectangleF bounds;
-        private static ParticleSettings set = ParticleSettings.Default();
+        private static ParticleSettings settings = ParticleSettings.Default();
         #endregion
 
         #region StaticProperties
@@ -35,172 +32,175 @@ namespace Particles
             set
             {
                 bounds = value;
-                if (mybuf)
+                if (useBuffer)
                 {
-                    buff?.Dispose();
-                    buff = new Bitmap((int)bounds.Width + 1, (int)bounds.Height + 1);
+                    buffer?.Dispose();
+                    buffer = new Bitmap((int)bounds.Width + 1, (int)bounds.Height + 1);
                 }
-                bg = Graphics.FromImage(buff);
-                bg.SmoothingMode = SmoothingMode.AntiAlias;
+                bufferedGraphics = Graphics.FromImage(buffer);
+                bufferedGraphics.SmoothingMode = SmoothingMode.AntiAlias;
             }
         }
-        public static ParticleSettings Settings { get => set; internal set => set = value; }
+
+        public static ParticleSettings Settings
+        {
+            get => settings;
+            internal set => settings = value;
+        }
         #endregion
 
         #region Fields
-        public PointF loc;
-        public float scale; //speed-size
-        public float angle;
-        public int coob; // count out of bounds
-        public Color color;
-        public List<PointF> tracing = new List<PointF>();
-        #endregion        
+        private int outOfBoundsCounter; // count out of bounds
+        internal List<PointF> oldLocations = new List<PointF>();
+        public PointF Location;
+        public float Scale; //speed and size
+        public float Angle;
+        public Color Color;
+        #endregion
 
         #region Properties
-        public float f_speed => scale * set._speedScale; // TODO RENAME
-        public float f_size => scale * set._sizeScale;
-        public SizeF a_vec => new SizeF(f_speed * cos(angle), f_speed * sin(angle));
-
+        public float Speed => Scale * settings._speedScale;
+        public float Size => Scale * settings._sizeScale;
+        public SizeF MoveVector => new SizeF(Speed * Cos(Angle), Speed * Sin(Angle));
         #endregion
 
         #region StaticMethods
         internal static void SetBuffer(Bitmap buf)
         {
-            buff = buf;
-            bg = Graphics.FromImage(buff);
-            mybuf = false;
+            buffer = buf;
+            bufferedGraphics = Graphics.FromImage(buffer);
+            useBuffer = false;
         }
+
         internal static void BeginDraw()
         {
-            if (set._clearBuffer)
-            {//5984
-             //bg.Clear(set._backGroundColor);
-
-                brsh.Color = set._backGroundColor;
-                Brush b = brsh;
+            if (settings._clearBuffer)
+            {
+                brush.Color = settings._backGroundColor;
                 if (bounds.Width != 0 && bounds.Height != 0)
                 {
-                    //b = new LinearGradientBrush(bounds, set.bgColorFirst, set.bgColorSecond, set.bgStyle);
-                    bg.FillRectangle(b, bounds);
+                    bufferedGraphics.FillRectangle(brush, bounds);
                 }
 
             }
-            switch (set._colorMode)
+            switch (settings._colorMode)
             {
                 case ParticleSettings.EColorMode.Overall:
-                    brsh.Color = set._overallColor;
+                    brush.Color = settings._overallColor;
                     break;
                 case ParticleSettings.EColorMode.RandomOverall:
-                    brsh.Color = rnd_cl();
+                    brush.Color = RandomColor();
                     break;
                 default:
                     break;
             }
         }
+
         public static void Save(string name)
         {
             //buff.Save(Environment.CurrentDirectory + "\\" + name);
             FileStream sw = new FileStream(name, FileMode.Create);
-            Bitmap bmp = new Bitmap(buff, (int)bounds.Width, (int)bounds.Height);
+            Bitmap bmp = new Bitmap(buffer, (int)bounds.Width, (int)bounds.Height);
             bmp.Save(sw, ImageFormat.Png);
             sw.Close();
         }//TODO!
         #endregion
 
-        #region ctor-s
-        public Particle(float Angle, float Scale, Color Color, PointF Location = new PointF())
+        #region constructors
+        public Particle(float angle, float scale, Color color, PointF location = new PointF())
         {
-            scale = Scale;
-            angle = Angle;
-            if (Location != PointF.Empty)
+            this.Scale = scale;
+            this.Angle = angle;
+            if (location != PointF.Empty)
             {
-                loc = Location;
+                this.Location = location;
             }
             else
             {
                 ResetLocation();
             }
 
-            color = Color;
+            this.Color = color;
         }
-        public Particle() : this(rnd_f(set._newAngleRange.X, set._newAngleRange.Y), rnd_f(minScale, maxScale, 10000), rnd_cl()) { }
+
+        public Particle() : this(RandomFloat(settings._newAngleRange.X, settings._newAngleRange.Y), RandomFloat(minScale, maxScale), RandomColor()) { }
         #endregion
 
         #region Methods
         public void ResetLocation()
         {
-            switch (set._newLocationMode)
+            switch (settings._newLocationMode)
             {
                 case ParticleSettings.ENewLocationMode.Center:
-                    loc = new PointF(bounds.Width / 2, bounds.Height / 2);
+                    Location = new PointF(bounds.Width / 2, bounds.Height / 2);
                     break;
                 case ParticleSettings.ENewLocationMode.Random:
-                    loc = new PointF(rnd_f(bounds.Width), rnd_f(bounds.Height));
+                    Location = new PointF(RandomFloat(bounds.Width), RandomFloat(bounds.Height));
                     break;
                 case ParticleSettings.ENewLocationMode.Zeroes:
-                    loc = new PointF();
+                    Location = new PointF();
                     break;
                 case ParticleSettings.ENewLocationMode.Point:
-                    loc = set._newLocationPoint;
+                    Location = settings._newLocationPoint;
                     break;
                 default:
                     break;
             }
-            if ((set._bounceMode & ParticleSettings.EBounceMode.ResetTracing) == ParticleSettings.EBounceMode.ResetTracing)
+            if ((settings._bounceMode & ParticleSettings.EBounceMode.ResetTracing) == ParticleSettings.EBounceMode.ResetTracing)
             {
-                tracing.Clear();
+                oldLocations.Clear();
             }
 
-            if (set._resetAngle)
+            if (settings._resetAngle)
             {
-                angle = rnd_f(set._newAngleRange.X, set._newAngleRange.Y);
+                Angle = RandomFloat(settings._newAngleRange.X, settings._newAngleRange.Y);
             }
 
-            scale = rnd_f(minScale, maxScale);
+            Scale = RandomFloat(minScale, maxScale);
         }
         public void Draw()
         {
-            SizeF sz = new SizeF(f_size, f_size);
+            SizeF sz = new SizeF(Size, Size);
             SizeF hs = new SizeF(sz.Width / 2, sz.Height / 2);
-            RectangleF rec = new RectangleF(PointF.Subtract(loc, hs), sz);
-            switch (set._colorMode)
+            RectangleF rec = new RectangleF(PointF.Subtract(Location, hs), sz);
+            switch (settings._colorMode)
             {
                 case ParticleSettings.EColorMode.Own:
-                    brsh.Color = color;
+                    brush.Color = Color;
                     break;
                 case ParticleSettings.EColorMode.Function:
-                    brsh.Color = set._colorCreator.GetColor(loc.X / bounds.Width, loc.Y / bounds.Height, 1);
+                    brush.Color = settings._colorCreator.GetColor(Location.X / bounds.Width, Location.Y / bounds.Height, 1);
                     break;
                 case ParticleSettings.EColorMode.RandomOwn:
-                    brsh.Color = rnd_cl();
+                    brush.Color = RandomColor();
                     break;
                 default:
                     break;
             }
-            brsh.Color = Color.FromArgb((byte)(255 * set._alpha), brsh.Color);
-            if (set._showTracingLine && tracing.Count > 1)
+            brush.Color = Color.FromArgb((byte)(255 * settings._alpha), brush.Color);
+            if (settings._showTracingLine && oldLocations.Count > 1)
             {
-                bg.DrawCurve(new Pen(brsh.Color), tracing.ToArray());
+                bufferedGraphics.DrawCurve(new Pen(brush.Color), oldLocations.ToArray());
             }
 
-            switch (set._shape)
+            switch (settings._shape)
             {
                 case ParticleSettings.EShape.Sphere:
-                    bg.FillEllipse(brsh, rec);
+                    bufferedGraphics.FillEllipse(brush, rec);
                     break;
                 case ParticleSettings.EShape.Rectangle:
-                    bg.FillRectangle(brsh, rec);
+                    bufferedGraphics.FillRectangle(brush, rec);
                     break;
                 case ParticleSettings.EShape.Custom:
                     goto default;
                     string str = keywords[GetHashCode() % keycount];
-                    Font fon = new Font(str, abs(f_size));
-                    sz = bg.MeasureString(str, fon);
+                    Font fon = new Font(str, MyMath.Abs(Size));
+                    sz = bufferedGraphics.MeasureString(str, fon);
                     hs = new SizeF(sz.Width / 2, sz.Height / 2);
-                    bg.DrawString(str, fon, brsh, PointF.Subtract(loc, hs));
+                    bufferedGraphics.DrawString(str, fon, brush, PointF.Subtract(Location, hs));
                     break;
                 default:
-                    bg.FillClosedCurve(brsh, Polygon(loc, hs, angle), FillMode.Alternate, set._tension);
+                    bufferedGraphics.FillClosedCurve(brush, Polygon(Location, hs, Angle), FillMode.Alternate, settings._tension);
                     //bg.FillPolygon(brsh, Polygon(loc, hs, angle), FillMode.Alternate);
                     break;
             }
@@ -208,85 +208,85 @@ namespace Particles
 
         private static PointF[] Polygon(PointF loc, SizeF hs, float angle)
         {
-            return set._shapecreator.GetPoints(loc, hs, angle);
+            return settings._shapecreator.GetPoints(loc, hs, angle);
         }
 
         public void Step()
         {
-            PointF v = PointF.Add(loc, a_vec);
-            if (bounds.Contains(v)) { loc = v; coob = 0; }
+            PointF v = PointF.Add(Location, MoveVector);
+            if (bounds.Contains(v)) { Location = v; outOfBoundsCounter = 0; }
             else
             {
-                if (++coob == 5) { ResetLocation(); coob = 0; return; }
-                ParticleSettings.EBounceMode bnc = set._bounceMode;
+                if (++outOfBoundsCounter == 5) { ResetLocation(); outOfBoundsCounter = 0; return; }
+                ParticleSettings.EBounceMode bnc = settings._bounceMode;
                 if ((bnc & ParticleSettings.EBounceMode.ReflectAngle) == ParticleSettings.EBounceMode.ReflectAngle)
                 {
                     if (v.X < bounds.Left || bounds.Right < v.X)
                     {
-                        angle = 180 - angle;
+                        Angle = 180 - Angle;
                     }
 
                     if (v.Y < bounds.Top || bounds.Bottom < v.Y)
                     {
-                        angle = -angle;
+                        Angle = -Angle;
                     }
 
-                    loc = PointF.Add(loc, a_vec);
+                    Location = PointF.Add(Location, MoveVector);
                 }
                 if ((bnc & ParticleSettings.EBounceMode.OppositeSide) == ParticleSettings.EBounceMode.OppositeSide)
                 {
                     if (v.X < bounds.Left) { v.X += bounds.Width; } else if (bounds.Right < v.X) { v.X -= bounds.Width; }
                     if (v.Y < bounds.Top) { v.Y += bounds.Height; } else if (bounds.Bottom < v.Y) { v.Y -= bounds.Height; }
-                    loc = v;
+                    Location = v;
                 }
                 if ((bnc & ParticleSettings.EBounceMode.ResetTracing) == ParticleSettings.EBounceMode.ResetTracing)
                 {
-                    tracing.Clear(); return;
+                    oldLocations.Clear(); return;
                 }
             }
-            if (tracing.Count >= set._tracingLen)
+            if (oldLocations.Count >= settings._tracingLen)
             {
-                tracing.RemoveRange(0, tracing.Count - set._tracingLen);
+                oldLocations.RemoveRange(0, oldLocations.Count - settings._tracingLen);
             }
 
-            tracing.Add(loc);
+            oldLocations.Add(Location);
         }
         public void InteractM(Point mloc, float scale = 1)
         {
             float tmp; SizeF sz;
-            switch (set._mouseClickAction)
+            switch (settings._mouseClickAction)
             {
                 case ParticleSettings.EMouseClickAction.ChangeAngle:
                     sz = new SizeF((-0.5f + mloc.Y / bounds.Height) * scale, (-0.5f + mloc.X / bounds.Width) * scale);
-                    set._speedScale = (float)Sqrt(sz.Height * sz.Height + sz.Width * sz.Width) * 2;
-                    angle = (float)(Atan2(sz.Width, sz.Height) * 180 / PI);
+                    settings._speedScale = (float)Sqrt((double)(sz.Height * sz.Height + sz.Width * sz.Width)) * 2;
+                    Angle = (float)(Atan2(sz.Width, sz.Height) * 180 / PI);
                     break;
                 case ParticleSettings.EMouseClickAction.RotateParticles:
-                    angle = (float)(Atan2(scale * (loc.X - mloc.X), scale * (mloc.Y - loc.Y)) * 180 / PI + PI);
+                    Angle = (float)(Atan2(scale * (Location.X - mloc.X), scale * (mloc.Y - Location.Y)) * 180 / PI + PI);
                     break;
                 case ParticleSettings.EMouseClickAction.AngleToMouse:
-                    angle = (float)(Atan2(scale * (mloc.Y - loc.Y), scale * (mloc.X - loc.X)) * 180 / PI);
+                    Angle = (float)(Atan2(scale * (mloc.Y - Location.Y), scale * (mloc.X - Location.X)) * 180 / PI);
                     break;
                 case ParticleSettings.EMouseClickAction.Bubble:
-                    tmp = (sqrt(sqr(loc.X - mloc.X) + sqr(loc.Y - mloc.Y)) / sqrt(sqr(bounds.Width) + sqr(bounds.Height)));
+                    tmp = (Sqrt(Sqr(Location.X - mloc.X) + Sqr(Location.Y - mloc.Y)) / Sqrt(Sqr(bounds.Width) + Sqr(bounds.Height)));
                     tmp = (1 - scale) / 2 + scale * tmp;
-                    this.scale = tmp * maxScale + minScale;
+                    this.Scale = tmp * maxScale + minScale;
                     break;
                 default:
                     /*float dw = mloc.X / bounds.Width;
                     float dh = mloc.Y / bounds.Height;
                     set._sizeScale = dw;
                     set._speedScale = dh;*/
-                    tmp = (float)(Atan2(scale * (mloc.Y - loc.Y), scale * (mloc.X - loc.X)) * 180 / PI);
-                    sz = new SizeF(f_speed * cos(tmp), f_speed * sin(tmp));
-                    tmp = 10f * f_size * (sqrt(sqr(loc.X - mloc.X) + sqr(loc.Y - mloc.Y)) / sqrt(sqr(bounds.Width) + sqr(bounds.Height)));
+                    tmp = (float)(Atan2(scale * (mloc.Y - Location.Y), scale * (mloc.X - Location.X)) * 180 / PI);
+                    sz = new SizeF(Speed * Cos(tmp), Speed * Sin(tmp));
+                    tmp = 10f * Size * (Sqrt(Sqr(Location.X - mloc.X) + Sqr(Location.Y - mloc.Y)) / Sqrt(Sqr(bounds.Width) + Sqr(bounds.Height)));
                     if (float.IsInfinity(tmp))
                     {
                         tmp = 0;
                     }
 
                     sz = new SizeF(sz.Width * tmp, sz.Height * tmp);
-                    loc = PointF.Add(loc, sz);
+                    Location = PointF.Add(Location, sz);
                     //angle += Abs(tmp - angle) / 30;
                     //angle = sqrt(sqr(angle) + sqr(tmp));
                     break;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.IO;
 using System.Windows.Forms;
@@ -33,7 +33,7 @@ namespace Particles
             }
 
             Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
+            //Application.SetCompatibleTextRenderingDefault(false);
 
             Application.Run(new MainForm(AppDomain.CurrentDomain.FriendlyName.EndsWith(".scr", StringComparison.OrdinalIgnoreCase)));
         }

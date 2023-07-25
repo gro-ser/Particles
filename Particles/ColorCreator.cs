@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Xml.Serialization;
@@ -15,25 +15,25 @@ namespace Particles
     {
         public abstract Color GetColor(float x, float y, float Alpha);
 
-        private static float[] hsvRanges => new float[] { 0 / 6f, 1 / 6f, 2 / 6f, 3 / 6f, 4 / 6f, 5 / 6f, 6 / 6f };
+        private static float[] HSVRanges => new float[] { 0 / 6f, 1 / 6f, 2 / 6f, 3 / 6f, 4 / 6f, 5 / 6f, 6 / 6f };
 
-        private static Color[] hsvColors => new Color[] { rgb(255, 0, 0), rgb(255, 255, 0), rgb(0, 255, 0), rgb(0, 255, 255), rgb(0, 0, 255), rgb(255, 0, 255), rgb(255, 0, 0) };
-#pragma warning disable IDE0032
+        private static Color[] HSVColors => new Color[] { RGB(255, 0, 0), RGB(255, 255, 0), RGB(0, 255, 0), RGB(0, 255, 255), RGB(0, 0, 255), RGB(255, 0, 255), RGB(255, 0, 0) };
+
         private static readonly ColorCreator
             rgb1 = new Fun1(),
             rgb2 = new Fun2(),
-            hsv1 = new RangeColors(hsvRanges, hsvColors, 1, 0),
-            hsv2 = new RangeColors(hsvRanges, hsvColors, 0, 1),
+            hsv1 = new RangeColors(HSVRanges, HSVColors, 1, 0),
+            hsv2 = new RangeColors(HSVRanges, HSVColors, 0, 1),
             rus = new RangeColors(
                 new float[] { 0, 1 / 3f, 1 / 3f, 2 / 3f, 2 / 3f, 1 },
-                new Color[] { rgb(255, 255, 255), rgb(255, 255, 255), rgb(0, 57, 166), rgb(0, 57, 166), rgb(213, 43, 30), rgb(213, 43, 30) },
+                new Color[] { RGB(255, 255, 255), RGB(255, 255, 255), RGB(0, 57, 166), RGB(0, 57, 166), RGB(213, 43, 30), RGB(213, 43, 30) },
                 0, 1, false),
             ukr = new RangeColors(
                 new float[] { 0, 1 / 2f, 1 / 2f, 1 },
-                new Color[] { rgb(0, 87, 184), rgb(0, 87, 184), rgb(255, 215, 0), rgb(255, 215, 0), },
+                new Color[] { RGB(0, 87, 184), RGB(0, 87, 184), RGB(255, 215, 0), RGB(255, 215, 0), },
                 0, 1, false),
             fimg = new FromImage();
-#pragma warning restore IDE0032
+
         public static ColorCreator RGB1 => rgb1;
         public static ColorCreator RGB2 => rgb2;
         public static ColorCreator HSVx => hsv1;
@@ -42,12 +42,12 @@ namespace Particles
         public static ColorCreator UKRf => ukr;
         public static ColorCreator FIMG => fimg;
 
-        private static Color rgb(int r, int g, int b)
+        private static Color RGB(int r, int g, int b)
         {
             return Color.FromArgb(r, g, b);
         }
 
-        private static Color argb(float a, float r, float g, float b)
+        private static Color ARGB(float a, float r, float g, float b)
         {
             return Color.FromArgb((byte)(255 * a), (byte)(255 * r), (byte)(255 * g), (byte)(255 * b));
         }
@@ -57,17 +57,19 @@ namespace Particles
         {
             public override Color GetColor(float x, float y, float Alpha)
             {
-                return argb(Alpha, 1 - x, 1 - y, (x + y) / 2);
+                return ARGB(Alpha, 1 - x, 1 - y, (x + y) / 2);
             }
         }
+
         [Serializable]
         public class Fun2 : ColorCreator
         {
             public override Color GetColor(float x, float y, float Alpha)
             {
-                return argb(Alpha, x, y, 1 - (x + y) / 2);
+                return ARGB(Alpha, x, y, 1 - (x + y) / 2);
             }
         }
+
         [Serializable]
         public class RangeColors : ColorCreator
         {
@@ -75,12 +77,15 @@ namespace Particles
             private Color[] colors;
             private float dx, dy;
             private bool gradient;
+
             public RangeColors() { }
+
             public RangeColors(float[] ranges, Color[] colors, float dx, float dy, bool gradient = true)
             {
                 this.ranges = ranges;
                 this.colors = colors;
-                this.dx = dx; this.dy = dy;
+                this.dx = dx;
+                this.dy = dy;
                 this.gradient = gradient;
             }
 
@@ -118,18 +123,29 @@ namespace Particles
                         break;
                     }
                 }
-                return argb(Alpha, r, g, b);
+                return ARGB(Alpha, r, g, b);
             }
         }
+
         [Serializable]
         public class FromImage : ColorCreator
         {
-            private Bitmap img = null;
+            private Bitmap image = null;
             private Size size;
-            public Bitmap Image { get => img; set { img = value; size = img.Size; } }
+
+            public Bitmap Image
+            {
+                get => image;
+                set
+                {
+                    image = value;
+                    size = image.Size;
+                }
+            }
+
             public override Color GetColor(float x, float y, float Alpha)
             {
-                if (img == null || x >= 1 || y >= 1 || x < 0 || y < 0)
+                if (image == null || x >= 1 || y >= 1 || x < 0 || y < 0)
                 {
                     return Color.Transparent;
                 }
@@ -138,7 +154,7 @@ namespace Particles
                 int iy = (int)(size.Height * y);
                 try
                 {
-                    Color c = img.GetPixel(ix, iy);
+                    Color c = image.GetPixel(ix, iy);
                     c = Color.FromArgb((byte)(255 * Alpha), c);
                     return c;
                 }
@@ -148,7 +164,6 @@ namespace Particles
                 }
                 return Color.White;
             }
-
         }
     }
 }

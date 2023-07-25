@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.ComponentModel;
 using System.ComponentModel.Design.Serialization;
@@ -11,21 +11,21 @@ namespace Particles
     internal class PointFConverter : TypeConverter
     {
         /// <summary>
-		///         Определяет, если этот преобразователь выполнить преобразование объекта заданного исходного типа в собственный тип преобразователя.
-		///       </summary>
-		/// <param name="context">
-		///           Контекст средства форматирования.
-		///            Этот объект можно использовать для получения дополнительных сведений о среде, из которой вызывается данный преобразователь.
-		///            Это может быть <see langword="null" />, поэтому всегда следует выполнять проверку.
-		///            Кроме того, свойства объекта контекста могут также возвращать <see langword="null" />.
-		///         </param>
-		/// <param name="sourceType">
-		///           Для преобразования из нужного типа.
-		///         </param>
-		/// <returns>
-		///         <see langword="true" /> Если этот объект может выполнить преобразование; в противном случае — <see langword="false" />.
-		///       </returns>
-		public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
+        ///         Определяет, если этот преобразователь выполнить преобразование объекта заданного исходного типа в собственный тип преобразователя.
+        ///       </summary>
+        /// <param name="context">
+        ///           Контекст средства форматирования.
+        ///            Этот объект можно использовать для получения дополнительных сведений о среде, из которой вызывается данный преобразователь.
+        ///            Это может быть <see langword="null" />, поэтому всегда следует выполнять проверку.
+        ///            Кроме того, свойства объекта контекста могут также возвращать <see langword="null" />.
+        ///         </param>
+        /// <param name="sourceType">
+        ///           Для преобразования из нужного типа.
+        ///         </param>
+        /// <returns>
+        ///         <see langword="true" /> Если этот объект может выполнить преобразование; в противном случае — <see langword="false" />.
+        ///       </returns>
+        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
             return sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
         }

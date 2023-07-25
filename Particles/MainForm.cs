@@ -1,4 +1,4 @@
-﻿using Particles.Properties;
+using Particles.Properties;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,10 +13,11 @@ namespace Particles
     {
         private const bool ShowFPS = true;
         private const int frames = 30;
+
         private static readonly int MAC = Enum.GetNames(typeof(ParticleSettings.EMouseClickAction)).Length;
         private readonly List<int> fps = new List<int>(frames);
-        private readonly SettingsForm sett = new SettingsForm();
-        private readonly List<Particle> list = new List<Particle>();
+        private readonly SettingsForm settingsForm = new SettingsForm();
+        private readonly List<Particle> particles = new List<Particle>();
         private Point MLoc;
         private float scale;
         private readonly Stopwatch sw = new Stopwatch();
@@ -34,7 +35,7 @@ namespace Particles
 
             else
             {
-                sett.Show();
+                settingsForm.Show();
             }
 
             Size sz = Screen.PrimaryScreen.Bounds.Size;
@@ -105,7 +106,7 @@ namespace Particles
             Particle.Bounds = ClientRectangle;
             for (int i = Particle.Settings.CountOfParticles - 1; i >= 0; i--)
             {
-                list.Add(new Particle());
+                particles.Add(new Particle());
             }
         }
 
@@ -119,7 +120,7 @@ namespace Particles
         {
             sw.Restart();
             Particle.BeginDraw();
-            foreach (Particle p in list)
+            foreach (Particle p in particles)
             {
                 if (!MLoc.IsEmpty)
                 {
@@ -145,17 +146,17 @@ namespace Particles
         {
             switch (e.KeyCode)
             {
-                case Keys.F1: sett.Show(); break;
+                case Keys.F1: settingsForm.Show(); break;
                 case Keys.Space: timer1.Enabled = !timer1.Enabled; break;
                 case Keys.R: FormBorderStyle = (FormBorderStyle)(4 - (int)FormBorderStyle); break;
                 case Keys.S:
                     Particle.Save(DateTime.Now.Ticks + ".png");
                     break;
                 case Keys.Delete:
-                    list.Clear();
+                    particles.Clear();
                     for (int i = Particle.Settings.CountOfParticles - 1; i >= 0; i--)
                     {
-                        list.Add(new Particle());
+                        particles.Add(new Particle());
                     }
 
                     break;
@@ -178,7 +179,10 @@ namespace Particles
         private void Mouse(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.None)
-            { MLoc = Point.Empty; return; }
+            {
+                MLoc = Point.Empty;
+                return;
+            }
             MLoc = e.Location;
             if (e.Button == MouseButtons.Left)
             {

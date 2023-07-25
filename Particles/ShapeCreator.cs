@@ -35,7 +35,7 @@ namespace Particles
                 }
 
                 angle += factor;
-                arr[i] = new PointF(loc.X + scale * hs.Width * cos(angle), loc.Y + scale * hs.Height * sin(angle));
+                arr[i] = new PointF(loc.X + scale * hs.Width * Cos(angle), loc.Y + scale * hs.Height * Sin(angle));
             }
             return arr;
         }

@@ -61,7 +61,7 @@ namespace Particles.Drawing
                     brsh.Color = settings._overallColor;
                     break;
                 case ParticleSettings.EColorMode.RandomOverall:
-                    brsh.Color = rnd_cl();
+                    brsh.Color = RandomColor();
                     break;
                 default:
                     break;
@@ -70,27 +70,27 @@ namespace Particles.Drawing
 
         public void Draw(Particle p)
         {
-            SizeF sz = new SizeF(p.f_size, p.f_size);
+            SizeF sz = new SizeF(p.Size, p.Size);
             SizeF hs = new SizeF(sz.Width / 2, sz.Height / 2);
-            RectangleF rec = new RectangleF(PointF.Subtract(p.loc, hs), sz);
+            RectangleF rec = new RectangleF(PointF.Subtract(p.Location, hs), sz);
             switch (settings._colorMode)
             {
                 case ParticleSettings.EColorMode.Own:
-                    brsh.Color = p.color;
+                    brsh.Color = p.Color;
                     break;
                 case ParticleSettings.EColorMode.Function:
-                    brsh.Color = settings._colorCreator.GetColor(p.loc.X / bounds.Width, p.loc.Y / bounds.Height, 1);
+                    brsh.Color = settings._colorCreator.GetColor(p.Location.X / bounds.Width, p.Location.Y / bounds.Height, 1);
                     break;
                 case ParticleSettings.EColorMode.RandomOwn:
-                    brsh.Color = rnd_cl();
+                    brsh.Color = RandomColor();
                     break;
                 default:
                     break;
             }
             brsh.Color = Color.FromArgb((byte)(255 * settings._alpha), brsh.Color);
-            if (settings._showTracingLine && p.tracing.Count > 1)
+            if (settings._showTracingLine && p.oldLocations.Count > 1)
             {
-                bg.DrawCurve(new Pen(brsh.Color), p.tracing.ToArray());
+                bg.DrawCurve(new Pen(brsh.Color), p.oldLocations.ToArray());
             }
 
             switch (settings._shape)
@@ -102,10 +102,10 @@ namespace Particles.Drawing
                     bg.FillRectangle(brsh, rec);
                     break;
                 case ParticleSettings.EShape.Custom:
-                    bg.DrawString(GetHashCode().ToString(), new Font(font, abs(p.f_size)), brsh, p.loc);
+                    bg.DrawString(GetHashCode().ToString(), new Font(font, Abs(p.Size)), brsh, p.Location);
                     break;
                 default:
-                    bg.FillClosedCurve(brsh, settings._shapecreator.GetPoints(p.loc, hs, p.angle), FillMode.Alternate, settings._tension);
+                    bg.FillClosedCurve(brsh, settings._shapecreator.GetPoints(p.Location, hs, p.Angle), FillMode.Alternate, settings._tension);
                     break;
             }
         }

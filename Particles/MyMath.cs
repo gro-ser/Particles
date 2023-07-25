@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using static System.Math;
 
@@ -6,51 +6,52 @@ namespace Particles
 {
     internal static class MyMath
     {
-        private const int r_scale = 1000;
+        private const int randomScale = 1000;
         private static readonly Random r = new Random();
-        public static float sin(float a)
+
+        public static float Sin(float a)
         {
-            return (float)Sin(a * PI / 180);
+            return (float)Math.Sin(a * PI / 180);
         }
 
-        public static float cos(float a)
+        public static float Cos(float a)
         {
-            return (float)Cos(a * PI / 180);
+            return (float)Math.Cos(a * PI / 180);
         }
 
-        public static float abs(float a)
+        public static float Abs(float a)
         {
             return Abs(a);
         }
 
-        public static float sqr(float a)
+        public static float Sqr(float a)
         {
             return a * a;
         }
 
-        public static float sqrt(float a)
+        public static float Sqrt(float a)
         {
-            return (float)Sqrt(a);
+            return (float)Math.Sqrt(a);
         }
 
-        public static float rnd_f(float a, float b, int scale = r_scale)
+        public static float RandomFloat(float a, float b, int scale = randomScale)
         {
-            return rnd_f(b - a, scale) + a;
+            return RandomFloat(b - a, scale) + a;
         }
 
-        public static float rnd_f(float a, int scale = r_scale)
+        public static float RandomFloat(float a, int scale = randomScale)
         {
             return 1f * r.Next((int)(a * scale)) / scale;
         }
 
-        public static int rnd_i()
+        public static int RandomInt()
         {
             return r.Next();
         }
 
-        public static Color rnd_cl()
+        public static Color RandomColor()
         {
-            return Color.FromArgb(~0xFFFFFF | rnd_i());
+            return Color.FromArgb(~0xFFFFFF | RandomInt());
         }
 
         public static float Angle(SizeF s)

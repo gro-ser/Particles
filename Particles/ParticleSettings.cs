@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -39,11 +39,6 @@ namespace Particles
         #region Coloring
         private const string r_coloring = "Coloring";
         [Category(r_coloring)]
-        public LinearGradientMode bgStyle { get; set; }
-        [Category(r_coloring)]
-        public Color bgColorFirst { get; set; } = Color.Red;
-        [Category(r_coloring)]
-        public Color bgColorSecond { get; set; } = Color.Blue;
         public enum EColorMode
         {
             Overall,
@@ -87,13 +82,27 @@ namespace Particles
                 _colorFunction = value;
                 switch (value)
                 {
-                    case EColorFunction.RGB1: _colorCreator = ColorCreator.RGB1; break;
-                    case EColorFunction.RGB2: _colorCreator = ColorCreator.RGB2; break;
-                    case EColorFunction.HSV1: _colorCreator = ColorCreator.HSVx; break;
-                    case EColorFunction.HSV2: _colorCreator = ColorCreator.HSVy; break;
-                    case EColorFunction.RussianFlag: _colorCreator = ColorCreator.RUSf; break;
-                    case EColorFunction.UkraineFlag: _colorCreator = ColorCreator.UKRf; break;
-                    case EColorFunction.FromImage: _colorCreator = ColorCreator.FIMG; break;
+                    case EColorFunction.RGB1:
+                        _colorCreator = ColorCreator.RGB1;
+                        break;
+                    case EColorFunction.RGB2:
+                        _colorCreator = ColorCreator.RGB2;
+                        break;
+                    case EColorFunction.HSV1:
+                        _colorCreator = ColorCreator.HSVx;
+                        break;
+                    case EColorFunction.HSV2:
+                        _colorCreator = ColorCreator.HSVy;
+                        break;
+                    case EColorFunction.RussianFlag:
+                        _colorCreator = ColorCreator.RUSf;
+                        break;
+                    case EColorFunction.UkraineFlag:
+                        _colorCreator = ColorCreator.UKRf;
+                        break;
+                    case EColorFunction.FromImage:
+                        _colorCreator = ColorCreator.FIMG;
+                        break;
                     default: break;
                 }
             }
@@ -260,6 +269,7 @@ namespace Particles
             }
             return sb.Append('}').ToString();
         }
+
         public override string ToString()
         {
             return Info(this);
@@ -272,6 +282,7 @@ namespace Particles
             xml.Serialize(file, this);
             file.Close();
         }
+
         public static ParticleSettings LoadXml()
         {
             XmlSerializer xml = new XmlSerializer(typeof(ParticleSettings));
@@ -280,6 +291,7 @@ namespace Particles
             file.Close();
             return res;
         }
+
         public void SaveBin()
         {
             BinaryFormatter bin = new BinaryFormatter();
@@ -287,6 +299,7 @@ namespace Particles
             bin.Serialize(file, this);
             file.Close();
         }
+
         public static ParticleSettings LoadBin()
         {
             BinaryFormatter bin = new BinaryFormatter();
